@@ -1,0 +1,20 @@
+name: "General Knowledge RAG"
+description: "Document-based Q&A for retail digital lending policies and FAQs"
+version: "1.0.0"
+
+# RAG Configuration
+chunk_size: 400
+chunk_overlap: 50
+top_k: 5
+similarity_threshold: 0.55
+
+# Retrieval Strategy
+retrieval:
+  semantic_weight: 0.7
+  bm25_weight: 0.3
+  
+# Response Generation
+generation:
+  max_tokens: 400
+  temperature: 0.3
+  include_sources: true
