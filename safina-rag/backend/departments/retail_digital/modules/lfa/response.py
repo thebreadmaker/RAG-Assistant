@@ -19,6 +19,7 @@ class ResponseGenerator:
             response = self._call_llm(prompt)
             return self._clean_response(response)
         except Exception as e:
+            print(f"LLM generation failed: {e}")
             return self._fallback_response(eligibility_result)
     
     def _build_prompt(self, result: Dict, query: str) -> str:
@@ -30,39 +31,56 @@ class ResponseGenerator:
         actions = result.get('actions', [])
         
         if status == "Include":
-            return f"""Customer {customer_name} (ID: {customer_id}) is ELIGIBLE for an LFA loan.
+            return f"""Write a short response. Do not create a conversation.
 
-All eligibility checks passed. They can proceed with their loan application.
+FACTS:
+- Customer: {customer_name}
+- ID: {customer_id}
+- Status: ELIGIBLE
+- All checks passed
 
-Respond in a friendly, professional tone."""
+Write only this: "Good news! {customer_name} (ID: {customer_id}) is eligible for an LFA loan. All eligibility checks have passed and they can proceed with their application."
+
+Do not add anything else."""
         
-        # Build exclusion details
-        exclusion_details = "\n".join([
-            f"- {check['check']}: {check['description']}" 
-            for check in failed_checks[:3]  # Limit to top 3
-        ])
+        # Build simple, clear issue list
+        issues = []
+        for check in failed_checks[:2]:
+            check_name = check['check']
+            if 'DPD' in check_name or 'Arrears' in check_name:
+                issues.append("loan arrears exceeding 3 days, requiring a 60-day cooling period")
+            elif 'Turnover' in check_name:
+                issues.append("inconsistent credit turnovers and insufficient banking activity")
+            elif 'vintage' in check_name:
+                issues.append("insufficient banking relationship duration (less than 6 months)")
+            elif 'Active' in check_name:
+                issues.append("inactive account or mobile banking profile")
+            else:
+                issues.append(check['description'][:50])
         
-        action_steps = "\n".join([f"• {action}" for action in actions[:3]])
+        action_list = "\n".join([f"{i+1}. {action}" for i, action in enumerate(actions[:3])])
         
-        return f"""You are a helpful banking assistant. Answer this query: "{query}"
+        return f"""Write a professional banking response. Do not create a conversation. Do not use dialogue format.
 
-Customer: {customer_name} (ID: {customer_id})
-Status: NOT ELIGIBLE (Excluded)
+FACTS:
+- Customer: {customer_name}
+- ID: {customer_id}
+- Status: NOT ELIGIBLE
+- Issues: {', '.join(issues)}
+- Next review: {next_review}
 
-Failed Checks:
-{exclusion_details}
+REQUIRED FORMAT - Write EXACTLY this structure:
 
-Required Actions:
-{action_steps}
+Hello,
 
-Next Review Date: {next_review}
+The customer {customer_name} is currently not eligible for a loan limit.
 
-Provide a clear, empathetic explanation in 2-3 short paragraphs:
-1. What's wrong (in plain language)
-2. What they need to do
-3. When they can reapply
+This is due to:
+{action_list}
 
-Keep it conversational and helpful. Don't use technical jargon."""
+They may reapply after {next_review}.
+
+Write only this format. Do not add conversations. Do not add Customer: or Banking: labels."""
     
     def _call_llm(self, prompt: str) -> str:
         payload = {
@@ -70,8 +88,11 @@ Keep it conversational and helpful. Don't use technical jargon."""
             "prompt": prompt,
             "stream": False,
             "options": {
-                "temperature": 0.3,
-                "num_predict": 300
+                "temperature": 0.1,  # Very low temperature for consistency
+                "num_predict": 200,   # Shorter responses
+                "top_p": 0.5,         # More focused
+                "repeat_penalty": 1.2, # Prevent repetition
+                "stop": ["Customer:", "Banking:", "Q:", "A:"]  # Stop on dialogue markers
             }
         }
         
@@ -83,32 +104,57 @@ Keep it conversational and helpful. Don't use technical jargon."""
     def _clean_response(self, response: str) -> str:
         # Remove any system artifacts
         response = response.strip()
+        
         # Remove common LLM artifacts
-        response = response.replace("Assistant:", "").strip()
-        return response
+        for artifact in ["Assistant:", "Response:", "Banking:", "Customer:", "Q:", "A:"]:
+            response = response.replace(artifact, "")
+        
+        # Remove dialogue markers
+        lines = response.split('\n')
+        cleaned_lines = []
+        for line in lines:
+            line = line.strip()
+            # Skip lines that look like dialogue
+            if line.startswith(('Customer:', 'Banking:', 'Q:', 'A:')):
+                continue
+            if line:
+                cleaned_lines.append(line)
+        
+        response = '\n'.join(cleaned_lines)
+        
+        # Take only first few paragraphs if it's too long
+        paragraphs = response.split('\n\n')
+        if len(paragraphs) > 4:
+            response = '\n\n'.join(paragraphs[:4])
+        
+        return response.strip()
     
     def _fallback_response(self, result: Dict) -> str:
-        """Simple template-based response if LLM fails"""
+        """Enhanced template-based response if LLM fails"""
         customer_name = result.get('customer_name', 'Customer')
         customer_id = result.get('customer_id', 'Unknown')
         status = result.get('overall_status', 'Unknown')
         
         if status == "Include":
-            return f"{customer_name} (ID: {customer_id}) is eligible for an LFA loan. All checks passed."
+            return f"Good news! {customer_name} (ID: {customer_id}) is eligible for an LFA loan. All eligibility checks have passed and they can proceed with their application."
         
         failed = result.get('failed_checks', [])
         if not failed:
-            return f"{customer_name} (ID: {customer_id}) status: {status}"
+            return f"{customer_name} (ID: {customer_id}) - Status: {status}"
         
-        reasons = ", ".join([c['check'] for c in failed[:2]])
         next_review = result.get('next_review_date', 'Unknown')
+        actions = result.get('actions', [])
         
-        return f"""{customer_name} (ID: {customer_id}) is currently not eligible.
+        # Build structured response
+        action_text = "\n".join([f"{i+1}. {action}" for i, action in enumerate(actions[:3])])
+        
+        return f"""Hello,
 
-Issues: {reasons}
+The customer {customer_name} (ID: {customer_id}) is currently not eligible for a loan limit.
 
-Next review date: {next_review}
+This is due to:
+{action_text}
 
-Please contact customer support for detailed guidance."""
+They may reapply after {next_review}."""
 
 generator = ResponseGenerator()
