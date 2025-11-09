@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import React, { useState, useRef } from 'react'
 
 const DEPARTMENTS = [
   { tag: '@retail_digital', name: 'Retail Digital Lending' }

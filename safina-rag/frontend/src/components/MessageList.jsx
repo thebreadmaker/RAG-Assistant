@@ -1,3 +1,5 @@
+import React from 'react'
+
 function MessageList({ messages, isLoading, onExampleClick }) {
   if (messages.length === 0 && !isLoading) {
     return (

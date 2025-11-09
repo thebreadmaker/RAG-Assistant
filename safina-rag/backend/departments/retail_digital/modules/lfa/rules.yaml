@@ -1,0 +1,100 @@
+version: "2025-11-09"
+
+lfa_loan:
+  name: "Digital Personal Loan (Lending For All)"
+  max_arrears_days: 3
+  arrears_lookback_days: 60
+  dpd_cooling_period_days: 60
+  min_banking_months: 6
+  required_classification: "A5"
+
+  eligibility_checks:
+    - name: "Elma_check"
+      description: "Checks for active mobile banking (ELMA) AND if another account is already being considered for a limit."
+      csv_column: "Elma_check"
+      required_value: "Include"
+      exclusion_reason: "Elma_check"
+
+    - name: "Joint_Check"
+      description: "Account must be single/sole ownership."
+      csv_column: "Joint_Check"
+      required_value: "Include"
+      exclusion_reason: "Joint_Check"
+
+    - name: "Mandates_Check"
+      description: "Account mandates must be 'Sole Signatory', 'Solely', or 'To Sign Alone'."
+      csv_column: "Mandates_Check"
+      required_value: "Include"
+      exclusion_reason: "Mandates_Check"
+
+    - name: "Classification_Check"
+      description: "Internal account classification must be A5 or higher."
+      csv_column: "Classification_Check"
+      required_value: "Include"
+      exclusion_reason: "Classification_Check"
+
+    - name: "Risk_Class_Check_DS"
+      description: "Customer's CRB-based risk classification must be A5 or higher."
+      csv_column: "Risk_Class_Check_DS"
+      required_value: "Include"
+      exclusion_reason: "Risk_Class_Check_DS"
+
+    - name: "customer_vintage_Check"
+      description: "Customer must have banked for at least 6 months."
+      csv_column: "customer_vintage_Check"
+      required_value: "Include"
+      exclusion_reason: "customer_vintage_Check"
+
+    - name: "DPD_Arrears_Check_DS"
+      description: "Customer must have no loan arrears over 3 days within the past 60 days."
+      csv_column: "DPD_Arrears_Check_DS"
+      required_value: "Include"
+      exclusion_reason: "DPD_Arrears_Check_DS"
+
+    - name: "recency_check"
+      description: "Customer's credit turnovers must be consistent for at least 6 months."
+      csv_column: "recency_check"
+      required_value: "Y"
+      exclusion_reason: "inconsistent_CTOs"
+
+    - name: "Turnover_Check"
+      description: "Customer must have sufficient turnover amounts over 6 months."
+      csv_column: "Turnover_Check"
+      required_value: "Include"
+      exclusion_reason: "insufficient_CTOs"
+
+    - name: "Active_Inactive_Check"
+      description: "Customer's account and mobile banking profile must be active."
+      csv_column: "Active_Inactive_Check"
+      required_value: "Include"
+      exclusion_reason: "Active_Inactive_Check"
+
+    - name: "Linked_Base_Check"
+      description: "Linked customer bases must be properly maintained and risk-rated positively."
+      csv_column: "Linked_Base_Check"
+      required_value: "Include"
+      exclusion_reason: "Linked_Base_Check"
+
+    - name: "Scheme_Check_DS"
+      description: "Customer must not have a loan transferred or bought by another bank."
+      csv_column: "Scheme_Check_DS"
+      required_value: "Include"
+      exclusion_reason: "Scheme_Check_DS"
+
+    - name: "Staff_Check_DS"
+      description: "Customer must not be an internal staff member."
+      csv_column: "Staff_Check_DS"
+      required_value: "Include"
+      exclusion_reason: "Staff_Check_DS"
+
+    - name: "USAID_Check_DS"
+      description: "Customer must not be affiliated with USAID."
+      csv_column: "USAID_Check_DS"
+      required_value: "Include"
+      exclusion_reason: "USAID_Check_DS"
+
+    - name: "Affordability_Check"
+      description: "Customer's EMI obligation must not exceed estimated income."
+      csv_column: "Affordability_Check"
+      required_value: "Include"
+      exclusion_reason: "EMI_higher_than_proxy_income"
