@@ -56,11 +56,13 @@ class RAGGenerator:
             "prompt": prompt,
             "stream": False,
             "options": {
-                "temperature": 0.3,
-                "num_predict": 400
+                "temperature": 0.4,     # Slightly warmer for natural tone
+                "top_p": 0.7,           # Allows mild stylistic diversity
+                "num_predict": 512,     # More space for graceful pacing
+                "repeat_penalty": 1.1   # Softer phrasing, avoids stiffness
             }
         }
-        
+
         response = requests.post(self.ollama_url, json=payload, timeout=120)
         response.raise_for_status()
         

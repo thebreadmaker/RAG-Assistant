@@ -31,17 +31,19 @@ class ResponseGenerator:
         actions = result.get('actions', [])
         
         if status == "Include":
-            return f"""Write a short response. Do not create a conversation.
+            return f"""
+Write a composed and professional confirmation message.
 
 FACTS:
 - Customer: {customer_name}
 - ID: {customer_id}
 - Status: ELIGIBLE
-- All checks passed
 
-Write only this: "Good news! {customer_name} (ID: {customer_id}) is eligible for an LFA loan. All eligibility checks have passed and they can proceed with their application."
+RESPONSE:
+Good news — {customer_name} (ID: {customer_id}) is eligible for an LFA loan. 
+All eligibility checks have been successfully completed, and they can now proceed confidently with their application.
+"""
 
-Do not add anything else."""
         
         # Build simple, clear issue list
         issues = []
@@ -60,7 +62,8 @@ Do not add anything else."""
         
         action_list = "\n".join([f"{i+1}. {action}" for i, action in enumerate(actions[:3])])
         
-        return f"""Write a professional banking response. Do not create a conversation. Do not use dialogue format.
+        return f"""
+Write a professional, considerate message to explain the customer’s ineligibility.
 
 FACTS:
 - Customer: {customer_name}
@@ -69,18 +72,19 @@ FACTS:
 - Issues: {', '.join(issues)}
 - Next review: {next_review}
 
-REQUIRED FORMAT - Write EXACTLY this structure:
-
+RESPONSE:
 Hello,
 
-The customer {customer_name} is currently not eligible for a loan limit.
+The customer {customer_name} (ID: {customer_id}) is currently not eligible for a loan limit.
 
 This is due to:
 {action_list}
 
 They may reapply after {next_review}.
 
-Write only this format. Do not add conversations. Do not add Customer: or Banking: labels."""
+Maintain a composed and respectful tone — clear, factual, and supportive.
+"""
+
     
     def _call_llm(self, prompt: str) -> str:
         payload = {
@@ -88,14 +92,14 @@ Write only this format. Do not add conversations. Do not add Customer: or Bankin
             "prompt": prompt,
             "stream": False,
             "options": {
-                "temperature": 0.1,  # Very low temperature for consistency
-                "num_predict": 200,   # Shorter responses
-                "top_p": 0.5,         # More focused
-                "repeat_penalty": 1.2, # Prevent repetition
-                "stop": ["Customer:", "Banking:", "Q:", "A:"]  # Stop on dialogue markers
+                "temperature": 0.4,     # Slight variation for warmth
+                "top_p": 0.7,           # Adds expressive balance
+                "repeat_penalty": 1.1,  # Natural phrasing
+                "num_predict": 256,     # Short but composed output
+                "stop": ["Customer:", "Banking:", "Q:", "A:"]
             }
         }
-        
+
         response = requests.post(self.ollama_url, json=payload, timeout=30)
         response.raise_for_status()
         
@@ -130,31 +134,36 @@ Write only this format. Do not add conversations. Do not add Customer: or Bankin
         return response.strip()
     
     def _fallback_response(self, result: Dict) -> str:
-        """Enhanced template-based response if LLM fails"""
+        """Graceful fallback if LLM fails to generate a response."""
         customer_name = result.get('customer_name', 'Customer')
         customer_id = result.get('customer_id', 'Unknown')
         status = result.get('overall_status', 'Unknown')
         
         if status == "Include":
-            return f"Good news! {customer_name} (ID: {customer_id}) is eligible for an LFA loan. All eligibility checks have passed and they can proceed with their application."
+            return f"""
+    Good news — {customer_name} (ID: {customer_id}) is eligible for an LFA loan. 
+    All eligibility checks have passed, and they can proceed with confidence in their application.
+    """.strip()
         
         failed = result.get('failed_checks', [])
-        if not failed:
-            return f"{customer_name} (ID: {customer_id}) - Status: {status}"
-        
         next_review = result.get('next_review_date', 'Unknown')
         actions = result.get('actions', [])
         
-        # Build structured response
-        action_text = "\n".join([f"{i+1}. {action}" for i, action in enumerate(actions[:3])])
+        action_text = "\n".join([f"{i+1}. {action}" for i, action in enumerate(actions[:3])]) or "Pending review details."
         
-        return f"""Hello,
+        return f"""
+            Safina Assistant
 
-The customer {customer_name} (ID: {customer_id}) is currently not eligible for a loan limit.
+            Hello,
 
-This is due to:
-{action_text}
+            The customer {customer_name} (ID: {customer_id}) is currently not eligible for a loan limit.
 
-They may reapply after {next_review}."""
+            This is due to:
+            {action_text}
+
+            They may reapply after {next_review}.
+
+            If more details are required, I can help summarize the eligibility review outcomes again.
+            """.strip()
 
 generator = ResponseGenerator()
