@@ -6,9 +6,20 @@ class Settings(BaseSettings):
     # Redis
     redis_url: str = "redis://localhost:6379/0"
     
-    # LLM
+    # ============ CHANGED: Added LLM Provider Selection ============
+    # LLM Provider: "ollama" or "poe"
+    llm_provider: str = "ollama"
+    # ================================================================
+    
+    # Ollama Configuration
     ollama_host: str = "http://localhost:11434"
     ollama_model: str = "tinyllama"
+    
+    # ============ CHANGED: Added Poe Configuration ============
+    # Poe Configuration
+    poe_api_key: str = ""
+    poe_model: str = "Claude-Opus-4.1"
+    # ===========================================================
     
     # Cache TTLs
     customer_cache_ttl: int = 86400
@@ -19,7 +30,7 @@ class Settings(BaseSettings):
     api_host: str = "0.0.0.0"
     api_port: int = 8000
     
-    # RAG Settings - NEW
+    # RAG Settings
     embedding_model: str = "sentence-transformers/all-MiniLM-L6-v2"
     vector_db_persist_dir: Path = Path(__file__).parent.parent / "departments"
     chunk_size: int = 400
