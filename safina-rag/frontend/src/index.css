@@ -84,6 +84,8 @@ body {
   border-radius: 12px;
   line-height: 1.5;
   word-wrap: break-word;
+  white-space: pre-line; /* ADD THIS LINE */
+
 }
 
 .message.user .message-bubble {
