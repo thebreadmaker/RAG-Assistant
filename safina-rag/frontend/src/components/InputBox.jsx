@@ -55,7 +55,7 @@ function InputBox({ onSend, disabled }) {
 
   return (
     <div className="input-container">
-      <form onSubmit={handleSubmit} className="input-wrapper">
+      <div className="input-wrapper">
         {suggestions.length > 0 && (
           <div className="tag-suggestions">
             {suggestions.map((dept, idx) => (
@@ -71,26 +71,34 @@ function InputBox({ onSend, disabled }) {
           </div>
         )}
         
-        <input
-          ref={inputRef}
-          type="text"
-          className="input-box"
-          placeholder="Type @retail_digital then your question..."
-          value={input}
-          onChange={handleInputChange}
-          onKeyDown={handleKeyDown}
-          disabled={disabled}
-          autoFocus
-        />
-        
-        <button
-          type="submit"
-          className="send-button"
-          disabled={disabled || !input.trim()}
-        >
-          Send
-        </button>
-      </form>
+        <form onSubmit={handleSubmit} className="input-form">
+          <div className="input-box-container">
+            <input
+              ref={inputRef}
+              type="text"
+              className="input-box"
+              placeholder="How can I help you today?"
+              value={input}
+              onChange={handleInputChange}
+              onKeyDown={handleKeyDown}
+              disabled={disabled}
+              autoFocus
+            />
+            
+            <div className="input-controls">
+              <button
+                type="submit"
+                className="send-button"
+                disabled={disabled || !input.trim()}
+              >
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <path d="M8 2L8 14M8 2L12 6M8 2L4 6" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
     </div>
   )
 }
