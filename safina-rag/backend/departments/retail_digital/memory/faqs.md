@@ -1,106 +1,194 @@
-# Retail Digital Lending - Frequently Asked Questions
+# Digital Personal Loan – Frequently Asked Questions (FAQs)
 
-## Loan Products
+## 1. What is a digital personal loan?
+A digital personal loan is an unsecured term loan accessed through the NCBA NOW Mobile Banking App and disbursed instantly into your NCBA account.
 
-### What is the Lending For All (LFA) product?
-Lending For All is NCBA Bank's digital personal loan product designed for retail customers. It offers quick access to credit through mobile banking without requiring physical visits to the branch. The loan is unsecured and based on customer banking behavior and creditworthiness.
+---
 
-### What are the interest rates for LFA loans?
-Interest rates for LFA loans are competitive and personalized based on customer risk profile. Rates typically range from 13% to 18% per annum. The exact rate is communicated to eligible customers through the mobile banking app.
+## 2. What are the features of a digital personal loan?
+- Unsecured – no collateral required.  
+- Minimum loan limit: **KES 1,000**.  
+- Maximum loan limit: **KES 1,000,000** or foreign currency equivalent.  
+- Eligibility requires at least six months of banking with NCBA and an active personal current account.  
+- Minimum loan tenure: **3 months** for amounts below KES 50,000.  
+- Maximum loan tenure: **12 months** for amounts between KES 50,001 and KES 1,000,000.  
+- Accessible via the NCBA NOW App or **USSD *488#**.  
+- Comes with credit life insurance through NCBA Bancassurance.
 
-### What is the maximum loan amount available?
-The maximum loan amount varies per customer based on their banking relationship, turnover, and credit history. Amounts typically range from KES 5,000 to KES 500,000. Your personalized limit is shown in the NCBA mobile banking app.
+---
 
-## Eligibility Requirements
+## 3. How do I access digital personal loans?
+1. Log in to your NCBA NOW App.  
+2. Open the transaction menu and select **NOW Loans**.
 
-### What are the basic eligibility criteria?
-To qualify for an LFA loan, customers must:
-- Have an active NCBA account for at least 6 months
-- Be registered for NCBA mobile banking (ELMA)
-- Have consistent account turnover
-- Maintain good credit standing with no arrears
-- Have a single ownership account with sole signatory mandate
+---
 
-### Why am I not eligible for a loan?
-Common reasons for loan ineligibility include:
-- Banking relationship less than 6 months
-- Loan arrears exceeding 3 days in the past 60 days
-- Joint account ownership
-- Inactive account or mobile banking profile
-- Poor credit bureau rating (below A5)
-- Internal risk classification below A5
+## 4. What is the difference between digital personal loans and mobile loans?
+- **Digital Personal Loan:** Tenure of 3–12 months, limits from **KES 1,000 to KES 1,000,000**.  
+- **Mobile Loan:** One-month tenure, limits from **KES 2,000 to KES 70,000**.
 
-### How long does it take to become eligible after clearing arrears?
-After clearing all loan arrears, customers must wait for a 60-day cooling period before becoming eligible again. This allows the bank to assess improved payment behavior.
+---
 
-## Loan Application Process
+## 5. How do I qualify for the digital personal loan?
+You must have an active personal current account, bank with NCBA for at least six months, and maintain good account turnover.
 
-### How do I apply for an LFA loan?
-Applications are processed through the NCBA mobile banking app:
-1. Log into your NCBA mobile banking
-2. Navigate to the Loans section
-3. Check your pre-approved limit
-4. Select desired loan amount and repayment period
-5. Review terms and accept
-6. Funds are disbursed instantly to your account
+---
 
-### How quickly are loans disbursed?
-Once approved, loan funds are disbursed instantly to your linked NCBA account. The entire process from application to disbursement takes less than 5 minutes.
+## 6. Which accounts do not qualify?
+Diaspora, Wiser, Homeward, student, and business accounts do not qualify.
 
-### Can I top up my existing loan?
-Yes, if you have an existing LFA loan and have maintained good repayment behavior, you may be eligible for a top-up. The top-up option appears in your mobile banking app when available.
+---
 
-## Repayment
+## 7. After opening an account, how long until I qualify?
+You become eligible after **six months** of active transactions (consistent credits and debits).
 
-### What are the repayment options?
-LFA loans offer flexible repayment periods ranging from 1 to 12 months. Monthly installments are automatically debited from your NCBA account on the agreed date.
+---
 
-### What happens if I miss a payment?
-Missing payments affects your credit score and loan eligibility. If arrears exceed 3 days, you become ineligible for future loans until cleared plus the 60-day cooling period.
+## 8. What type of account qualifies?
+An active personal current account.
 
-### Can I pay off my loan early?
-Yes, early repayment is allowed without penalties. You can make full or partial prepayments through mobile banking or at any NCBA branch.
+---
 
-## Fees and Charges
+## 9. Do joint accounts qualify?
+No. Joint account holders must open and transact with personal current accounts to qualify.
 
-### What fees are charged on LFA loans?
-LFA loans have:
-- Processing fee: 4% of loan amount (one-time)
-- Excise duty: 20% on processing fee
-- No monthly maintenance fees
-- No early repayment penalties
+---
 
-### Are there any hidden charges?
-No. All fees are disclosed upfront before loan acceptance. The total cost of the loan is clearly shown in the mobile banking app.
+## 10. What are the charges for personal loans?
+Deductions from the borrowed amount include:
+- Processing fee: **4%**  
+- Interest: **20.6% p.a.** (reducing balance)  
+- Insurance: **0.08%**  
+- Excise duty: **20%**
 
-## Account Requirements
+---
 
-### What type of account do I need?
-You need a personal NCBA current or savings account with:
-- Single ownership (not joint)
-- Sole signatory mandate
-- Active status
-- Registered for mobile banking
+## 11. How do I check my limit?
+1. Log in to NCBA NOW App.  
+2. Go to **NOW Loans**.  
+3. If eligible, the personal loan menu appears; if not, no menu will display.  
+4. Limits are based on turnover, account activity, and CRB records.  
+5. Customers without limits should contact their Relationship Manager or the Contact Centre.
 
-### Can I use a joint account?
-No, LFA loans require single ownership accounts with sole signatory mandates. Joint accounts are not eligible.
+---
 
-## Credit Bureau and Risk Rating
+## 12. How long does it take to receive funds?
+Funds are disbursed instantly after a successful application.
 
-### How does CRB rating affect my eligibility?
-Your Credit Reference Bureau (CRB) rating must be A5 or higher to qualify. Lower ratings indicate higher credit risk and result in automatic exclusion.
+---
 
-### How can I improve my risk rating?
-Maintain consistent account activity, ensure timely loan repayments, keep good credit bureau standing, and build your banking relationship over time.
+## 13. How do I increase my limit?
+Improve account activity and maintain a positive CRB history.
 
-## Contact and Support
+---
 
-### How can I get help with my loan?
-For assistance:
-- Call NCBA Contact Center: 0711 056 000
-- Visit any NCBA branch
-- Email: customercare@ncbagroup.com
-- Use the chat feature in the mobile banking app
+## 14. How often are limits reviewed?
+Every **30 days**.
 
-### Where can I view my loan statement?
-Loan statements are available in the NCBA mobile banking app under Loans > Statement. You can also request via email or at any branch.
+---
+
+## 15. How do I check my loan balance?
+Log in to the app → NOW Loans → view balance under **Personal Loan**.
+
+---
+
+## 16. What is the repayment period?
+Repayment ranges from **3 to 12 months**, depending on the selected tenure.  
+- Loans below KES 50,000: fixed at **3 months**.
+
+---
+
+## 17. How do I repay my loan?
+Log in to NCBA NOW → NOW Loans → Repay.  
+Funds must be available in your current account.
+
+---
+
+## 18. Can I top up my personal loan?
+Not yet. Reach out to your Relationship Manager for alternatives.
+
+---
+
+## 19. Can I extend my repayment period?
+Not currently. Extensions will be rolled out later.
+
+---
+
+## 20. Can my limit be increased manually?
+No. Limits are system-generated and reviewed periodically based on credit behavior.
+
+---
+
+## 21. Where is the loan disbursed?
+To your NCBA current account.
+
+---
+
+## 22. What happens if I repay late?
+Late repayment may lead to:
+- CRB listing.  
+- Restriction from accessing digital personal loans for **6 months**, subject to repayment behavior.
+
+---
+
+## 23. How many days past due reduce the limit to zero?
+**Three (3) days past due.**
+
+---
+
+## 24. After late repayment, how long until reinstatement?
+**Two months** after clearing the arrears.
+
+---
+
+## 25. Does my CRB score affect my limit?
+Yes. A healthy CRB score is essential for qualification and maintaining limits.
+
+---
+
+## 26. Why is my digital or mobile loan limit not visible on the app?
+You either do not qualify, have no limit, or have not yet been scored.
+
+---
+
+## 27. Why has my limit reduced?
+Limits vary with your account activity. Inconsistent usage may lead to lower limits.
+
+---
+
+## 28. Why is the NOW Loans page blank after clearing my loan?
+Limits expire every 30 days. If your re-evaluation does not meet requirements, the limit may be revoked, resulting in a blank page.
+
+---
+
+## 29. Why do I get “No loan account found” when borrowing?
+You must apply from the **NOW Loans** page.
+
+---
+
+## 30. Why do I get “Dear Customer, we are currently processing your request”?
+An error has marked a loan as active. IT must correct it via **DARAJA**.
+
+---
+
+## 31. Why has my loan limit reduced?
+Limits depend on your monthly banking activity and overall consistency.
+
+---
+
+## 32. Why don’t I have a loan limit after clearing arrears?
+Days Past Due (DPD) affects eligibility:
+- **>3 days** overdue → no digital personal loan limit.  
+- **>9 days** overdue → no mobile/instant loan limit.  
+
+After clearing arrears, a **2-month cooling period** applies before review. You cannot access the product during this period.
+
+---
+
+## 33. How can I access my personal loan statement?
+Statements will be available on the app in a future release.  
+For now, contact the NCBA Contact Centre:
+- Phone: **+254711056444 / +254732156444**  
+- Email: **contact@ncbagroup.com**  
+- WhatsApp: **+254717804444**
+

@@ -27,3 +27,6 @@ pyyaml==6.0.1
 
 # CORS
 fastapi-cors==0.0.6
+
+# 🔥 Force CPU-only PyTorch (no Nvidia)
+--extra-index-url https://download.pytorch.org/whl/cpu
