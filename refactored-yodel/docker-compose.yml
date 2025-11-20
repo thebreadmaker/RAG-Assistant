@@ -3,7 +3,7 @@ version: '3.8'
 services:
   redis:
     image: redis:7-alpine
-    container_name: safina-redis
+    container_name: refactored-yodel-redis
     ports:
       - "6379:6379"
     volumes:
@@ -14,20 +14,5 @@ services:
       interval: 5s
       timeout: 3s
       retries: 5
-
-  ollama:
-    image: ollama/ollama:latest
-    container_name: safina-ollama
-    ports:
-      - "11434:11434"
-    volumes:
-      - ollama_data:/root/.ollama
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
 volumes:
   redis_data:
-  ollama_data:
