@@ -192,3 +192,5 @@ For now, contact the NCBA Contact Centre:
 - Email: **contact@ncbagroup.com**  
 - WhatsApp: **+254717804444**
 
+## 34. What is LFA?
+LFA stands for Lending For All which is also called the digital personal loan.

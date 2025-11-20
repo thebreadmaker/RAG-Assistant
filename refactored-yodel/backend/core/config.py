@@ -8,7 +8,9 @@ class Settings(BaseSettings):
     
     # LLM
     ollama_host: str = "http://localhost:11434"
-    ollama_model: str = "tinyllama"
+    ollama_model: str = "phi3.5:3.8b-mini-instruct-q5_K_M"
+    ollama_model: str = "llama3.2:3b"
+    
     
     # Cache TTLs
     customer_cache_ttl: int = 86400
@@ -33,3 +35,4 @@ class Settings(BaseSettings):
 @lru_cache()
 def get_settings():
     return Settings()
+
