@@ -29,7 +29,7 @@ class VectorManager:
         )
     
     def ingest(self, chunks: List[Dict]):
-        """Insert document chunks into VectorDB"""
+        """Insert document chunks with enhanced metadata"""
         if not chunks:
             return
         
@@ -38,7 +38,38 @@ class VectorManager:
         documents = [c["text"] for c in chunks]
         embeddings = self.embedder.encode(documents).tolist()
         ids = [c["id"] for c in chunks]
-        metadatas = [c["metadata"] for c in chunks]
+        
+        # ENHANCED: Add metadata fields
+        metadatas = []
+        for c in chunks:
+            meta = c["metadata"].copy()
+            
+            # Add document type classification
+            source = meta.get("source", "").lower()
+            if "faq" in source:
+                meta["doc_type"] = "faq"
+            elif "policy" in source or "policies" in source:
+                meta["doc_type"] = "policy"
+            elif "reasons" in source or ".csv" in source:
+                meta["doc_type"] = "structured_data"
+            else:
+                meta["doc_type"] = "general"
+            
+            # Extract topics (simple keyword matching)
+            text_lower = c["text"].lower()
+            topics = []
+            if any(kw in text_lower for kw in ["arrears", "overdue", "dpd", "late"]):
+                topics.append("arrears")
+            if any(kw in text_lower for kw in ["eligibility", "qualify", "eligible"]):
+                topics.append("eligibility")
+            if any(kw in text_lower for kw in ["fee", "charge", "cost", "interest"]):
+                topics.append("fees")
+            if any(kw in text_lower for kw in ["limit", "amount", "maximum", "minimum"]):
+                topics.append("limits")
+            
+            meta["topics"] = ",".join(topics) if topics else "general"
+            
+            metadatas.append(meta)
         
         collection.add(
             documents=documents,
@@ -46,7 +77,8 @@ class VectorManager:
             ids=ids,
             metadatas=metadatas
         )
-    
+        
+        print(f"Ingested {len(chunks)} chunks with enhanced metadata")
     def query(
         self, 
         query_text: str, 

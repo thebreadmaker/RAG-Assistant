@@ -101,34 +101,31 @@ async def ask_question(request: QueryRequest):
     logger.info(f"🔍 Query received: '{request.query}'")
     
     try:
-        # Route query
-        logger.debug("   Classifying query...")
-        query_info = router.classify_query(request.query)
-        logger.info(f"   Query type: {query_info.get('type')}")
+        # NEW: Analyze query first
+        from core.query_analyzer import analyzer
+        analysis = analyzer.analyze(request.query)
+        logger.info(f"Query analysis: type={analysis['query_type']}, synthesis={analysis['requires_synthesis']}")
         
-        # Handle customer-specific queries
+        # Route query
+        logger.debug("Classifying query...")
+        query_info = router.classify_query(request.query)
+        logger.info(f"Query type: {query_info.get('type')}")
+        
+        # Handle customer-specific queries (EXISTING CODE)
         if query_info['type'] == 'customer_specific':
             customer_id = query_info['customer_id']
             
-            # If no customer ID was extracted, fallback to general query
             if not customer_id:
-                logger.warning(f"   ⚠️ Query classified as customer_specific but no customer ID found")
-                logger.info(f"   Falling back to general query processing")
-                # Treat as general query instead
+                logger.warning(f"⚠️ Query classified as customer_specific but no customer ID found")
+                logger.info(f"Falling back to general query processing")
                 query_info['type'] = 'general'
             else:
-                logger.info(f"   Processing customer-specific query")
-                logger.info(f"   🧑 Customer ID: {customer_id}")
-                
-                # Check eligibility
-                logger.debug(f"   Checking eligibility for customer {customer_id}...")
+                # ... existing customer-specific code ...
+                logger.info(f"Processing customer-specific query")
+                logger.info(f"🧑 Customer ID: {customer_id}")
                 eligibility = processor.check_eligibility(customer_id)
-                logger.info(f"   ✅ Eligibility status: {eligibility.get('status')}")
-                
-                # Generate response
-                logger.debug(f"   Generating LFA response...")
+                logger.info(f"✅ Eligibility status: {eligibility.get('status')}")
                 answer = lfa_generator.generate(eligibility, request.query)
-                logger.debug(f"   Generated response: {answer[:100]}..." if len(answer) > 100 else f"   Generated response: {answer}")
                 
                 logger.info(f"✅ Query processed successfully (customer_specific)")
                 return QueryResponse(
@@ -137,19 +134,68 @@ async def ask_question(request: QueryRequest):
                     query_info=query_info
                 )
         
-        # Handle general queries with RAG
+        # NEW: Handle synthesis queries
+        if analysis['requires_synthesis'] and analysis['customer_ids']:
+            logger.info(f"Processing synthesis query")
+            
+            # Step 1: Get relevant policies
+            logger.debug(f"Retrieving policy chunks...")
+            filters = {"doc_type": "policy"} if analysis['topics'] else None
+            policy_chunks = retriever.retrieve(request.query, filters=filters)
+            logger.info(f"Retrieved {len(policy_chunks)} policy chunks")
+            
+            # Step 2: Synthesize customer data + policies
+            from core.synthesis import get_synthesis_engine
+            engine = get_synthesis_engine()
+            
+            synthesis_result = engine.synthesize(
+                query=request.query,
+                customer_ids=analysis['customer_ids'],
+                topics=analysis['topics'],
+                policy_chunks=policy_chunks
+            )
+            
+            logger.info(f"Synthesis: customer_data={synthesis_result['has_customer_data']}, policies={synthesis_result['has_policy_data']}")
+            
+            # Step 3: Generate answer with synthesis context
+            logger.debug(f"Generating synthesis answer...")
+            from departments.retail_digital.modules.general.prompts import build_synthesis_prompt
+            
+            prompt = build_synthesis_prompt(
+                query=request.query,
+                context=synthesis_result['context']
+            )
+            
+            # Call LLM
+            from departments.retail_digital.modules.general.generator import generator
+            response_text = generator._call_llm(prompt)
+            answer = generator._clean_response(response_text)
+            
+            logger.info(f"✅ Synthesis query processed")
+            return QueryResponse(
+                answer=answer,
+                metadata={
+                    "query_type": "synthesis",
+                    "customer_count": synthesis_result['customer_count'],
+                    "policy_count": synthesis_result['policy_count'],
+                    "sources": [c["metadata"]["source"] for c in policy_chunks[:3]]
+                },
+                query_info=query_info
+            )
+        
+        # Handle general queries (EXISTING CODE)
         if query_info['type'] == 'general':
-            logger.info(f"   Processing general query with RAG")
+            logger.info(f"Processing general query with RAG")
             
             # Retrieve relevant documents
-            logger.debug(f"   Retrieving relevant documents...")
+            logger.debug(f"Retrieving relevant documents...")
             chunks = retriever.retrieve(request.query)
-            logger.info(f"   ✅ Retrieved {len(chunks)} chunks")
+            logger.info(f"✅ Retrieved {len(chunks)} chunks")
             
             # Generate answer
-            logger.debug(f"   Generating RAG answer...")
+            logger.debug(f"Generating RAG answer...")
             result = rag_generator.generate(request.query, chunks)
-            logger.info(f"   ✅ RAG answer generated - Confidence: {result.get('confidence')}")
+            logger.info(f"✅ RAG answer generated - Confidence: {result.get('confidence')}")
             
             logger.info(f"✅ Query processed successfully (general/RAG)")
             return QueryResponse(
@@ -162,8 +208,8 @@ async def ask_question(request: QueryRequest):
                 query_info=query_info
             )
         
-        # Fallback
-        logger.warning(f"   ⚠️ Unknown query type, using fallback response")
+        # Fallback (EXISTING CODE)
+        logger.warning(f"⚠️ Unknown query type, using fallback response")
         return QueryResponse(
             answer="I'm not sure how to help with that. Please ask about customer eligibility or general policies.",
             metadata={},
@@ -179,7 +225,7 @@ async def ask_question(request: QueryRequest):
     except Exception as e:
         logger.error(f"❌ Internal error: {str(e)}", exc_info=True)
         raise HTTPException(500, f"Internal error: {str(e)}")
-
+    
 @app.post("/api/ingest")
 async def ingest_documents():
     """Endpoint to trigger document ingestion"""

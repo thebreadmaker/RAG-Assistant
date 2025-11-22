@@ -37,3 +37,34 @@ ANSWER:
 """
 
     return prompt
+
+def build_synthesis_prompt(query: str, context: str) -> str:
+    """Build prompt for synthesis queries (customer data + policies)"""
+    
+    prompt = f"""
+You are a professional banking assistant analyzing customer situations with policy documents.
+
+Your task is to connect the customer's specific data with the relevant policies to provide a clear, accurate answer.
+
+{context}
+
+USER QUESTION:
+{query}
+
+INSTRUCTIONS:
+1. Review the customer data above
+2. Identify which policy sections apply to their situation
+3. Connect the specific numbers/facts from customer data with policy thresholds
+4. Explain what actions or consequences apply
+5. Be direct and factual - cite sources using [document name]
+
+CRITICAL:
+- Use ONLY the information provided above
+- Connect customer's specific situation (days in arrears, status) with policy rules
+- If customer has X days in arrears, match it to the X-Y day policy threshold
+- Be concise (3-4 sentences maximum)
+
+ANSWER:
+"""
+    
+    return prompt

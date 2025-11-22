@@ -1,6 +1,6 @@
 import yaml
 from pathlib import Path
-from typing import List, Dict
+from typing import List, Dict, Optional
 from rank_bm25 import BM25Okapi
 from core.vector_manager import VectorManager
 from core.config import get_settings
@@ -26,17 +26,23 @@ class HybridRetriever:
         logger.debug(f"   No config file found, using defaults")
         return {}
     
-    def retrieve(self, query: str) -> List[Dict]:
-        """Retrieve relevant chunks using hybrid search"""
+    def retrieve(self, query: str, filters: Optional[Dict] = None) -> List[Dict]:
+        """Retrieve relevant chunks with optional metadata filters"""
         logger.info(f"🔎 Retrieval started - Query: '{query}'")
         
         top_k = self.config.get("top_k", settings.top_k)
         threshold = self.config.get("similarity_threshold", settings.similarity_threshold)
-        logger.debug(f"   Parameters: top_k={top_k}, threshold={threshold}")
         
-        # 1. Semantic search
-        logger.debug(f"   🔸 Semantic search (top_k={top_k * 2})...")
-        semantic_results = self.vector_manager.query(query, top_k=top_k * 2)
+        if filters:
+            logger.debug(f"Applying metadata filters: {filters}")
+        
+        # 1. Semantic search with filters
+        logger.debug(f"🔸 Semantic search (top_k={top_k * 2})...")
+        semantic_results = self.vector_manager.query(
+            query, 
+            top_k=top_k * 2,
+            filters=filters  # Pass filters to ChromaDB
+        )
         logger.debug(f"   Semantic results before filter: {len(semantic_results)} chunks")
         
         # Filter by threshold
