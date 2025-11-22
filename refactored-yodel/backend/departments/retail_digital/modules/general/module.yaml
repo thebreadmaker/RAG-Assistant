@@ -6,7 +6,7 @@ version: "1.0.0"
 chunk_size: 400
 chunk_overlap: 50
 top_k: 5
-similarity_threshold: 0.55
+similarity_threshold: 0.35
 
 # Retrieval Strategy
 retrieval:

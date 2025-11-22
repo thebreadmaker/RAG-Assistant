@@ -88,3 +88,27 @@ class VectorManager:
         """Get number of documents"""
         collection = self.get_or_create_collection()
         return collection.count()
+    
+    def verify_embeddings(self):
+        """Test embedding generation and similarity"""
+        test_texts = [
+            "digital personal loan",
+            "personal loan application",
+            "unrelated concept"
+        ]
+        
+        embeddings = self.embedder.encode(test_texts)
+        
+        # Check similarity
+        from numpy.linalg import norm
+        def cosine_sim(a, b):
+            return (a @ b) / (norm(a) * norm(b))
+        
+        sim_1_2 = cosine_sim(embeddings[0], embeddings[1])
+        sim_1_3 = cosine_sim(embeddings[0], embeddings[2])
+        
+        print(f"Similar texts similarity: {sim_1_2:.3f} (should be >0.6)")
+        print(f"Different texts similarity: {sim_1_3:.3f} (should be <0.4)")
+        
+        if sim_1_2 < 0.5:
+            raise ValueError("Embeddings not working correctly!")

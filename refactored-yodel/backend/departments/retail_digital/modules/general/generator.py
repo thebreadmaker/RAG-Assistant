@@ -30,6 +30,25 @@ class RAGGenerator:
                 "confidence": "low"
             }
         
+        # Limit context to top 3 chunks, max 300 chars each
+        top_chunks = retrieved_chunks[:3]
+        trimmed_chunks = []
+        for chunk in top_chunks:
+            text = chunk["text"]
+            if len(text) > 300:
+                text = text[:300] + "..."
+            trimmed_chunks.append({
+                "text": text,
+                "metadata": chunk["metadata"],
+                "score": chunk["score"]
+            })
+        
+        logger.debug(f"Using {len(trimmed_chunks)} chunks, avg length: {sum(len(c['text']) for c in trimmed_chunks) / len(trimmed_chunks):.0f} chars")
+        
+        # Build prompt with trimmed chunks
+        prompt = build_rag_prompt(query, trimmed_chunks)
+        logger.debug(f"Prompt length: {len(prompt)} chars (trimmed)")
+        
         # Build prompt with context
         logger.debug(f"   Building prompt with {len(retrieved_chunks)} chunks...")
         prompt = build_rag_prompt(query, retrieved_chunks)
@@ -81,17 +100,17 @@ class RAGGenerator:
             "prompt": prompt,
             "stream": False,
             "options": {
-                "temperature": 0.4,     # Slightly warmer for natural tone
-                "top_p": 0.7,           # Allows mild stylistic diversity
-                "num_predict": 512,     # More space for graceful pacing
-                "repeat_penalty": 1.1   # Softer phrasing, avoids stiffness
+                "temperature": 0.3,
+                "top_p": 0.7,
+                "num_predict": 300,  # REDUCED from 512
+                "repeat_penalty": 1.1
             }
         }
         
         logger.debug(f"      Payload: model={payload['model']}, temp={payload['options']['temperature']}")
 
         try:
-            response = requests.post(self.ollama_url, json=payload, timeout=120)
+            response = requests.post(self.ollama_url, json=payload, timeout=300)
             duration = time.time() - start_time
             
             logger.debug(f"      Status: {response.status_code} - Duration: {duration:.2f}s")

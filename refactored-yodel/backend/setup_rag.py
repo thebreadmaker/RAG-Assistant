@@ -62,6 +62,13 @@ def main():
         traceback.print_exc()
         return
     
+    # After ingestion
+    print("\n🔍 Verifying embeddings...")
+    from core.vector_manager import VectorManager
+    vm = VectorManager("retail_digital")
+    vm.verify_embeddings()
+    print("✅ Embeddings verified")
+    
     # 5. Verify setup
     print("\n🔍 Verifying setup...")
     try:

@@ -14,19 +14,21 @@ class QueryRouter:
     # Intent prototypes for semantic matching
     INTENT_PROTOTYPES = {
         "customer_specific": [
-            "check customer eligibility",
-            "why is customer excluded",
-            "customer loan status",
-            "account arrears check"
+            "why is customer 599741 excluded from LFA",
+            "check eligibility for account 5997410016",
+            "what are the failed checks for customer 599650",
+            "why was customer ID 503446 declined",
+            "show me customer 558473 arrears status"
         ],
         "general": [
-            "what is the policy",
-            "how does the process work",
-            "explain the requirements",
-            "what are the fees"
+            "what is the digital personal loan",
+            "explain the LFA eligibility requirements",
+            "how do I qualify for a loan",
+            "what are the charges and fees",
+            "tell me about the vacation policy",
+            "what happens if I repay late"
         ]
-    }
-    
+    }   
     def __init__(self):
         self.embedder = None
         self._intent_embeddings = {}
@@ -43,24 +45,42 @@ class QueryRouter:
         return self.embedder
     
     def classify_query(self, query: str) -> Dict:
-        logger.debug(f"   Router classifying query: '{query[:80]}...'") if len(query) > 80 else logger.debug(f"   Router classifying query: '{query}'")
+        logger.debug(f"Router classifying query: '{query[:80]}...'")
         
         tag = self._extract_tag(query)
         customer_id = self._extract_customer_id(query)
-        logger.debug(f"      Tag extracted: {tag}")
-        logger.debug(f"      Customer ID extracted: {customer_id}")
+        logger.debug(f"Tag extracted: {tag}")
+        logger.debug(f"Customer ID extracted: {customer_id}")
         
-        # If customer ID found, it's definitely customer-specific
+        # NEW: Rule-based pre-classification
+        query_lower = query.lower()
+        
+        # RULE 1: If customer ID found → customer_specific
         if customer_id:
             query_type = "customer_specific"
-            logger.debug(f"      Classification: customer_specific (ID found)")
-        else:
-            # Use semantic classification
+            logger.debug(f"Classification: customer_specific (ID found)")
+        
+        # RULE 2: If query asks "what is", "explain", "how to" → general
+        elif any(phrase in query_lower for phrase in [
+            "what is", "what are", "tell me about", "explain", 
+            "how do i", "how can i", "what happens"
+        ]):
+            query_type = "general"
+            logger.debug(f"Classification: general (question pattern)")
+        
+        # RULE 3: If query contains "customer", "account", "excluded" without ID → likely wants to ask about customer
+        elif any(word in query_lower for word in ["customer", "account", "excluded", "declined"]) and not customer_id:
+            # Use semantic only if ambiguous
             query_type = self._classify_intent(query)
-            logger.debug(f"      Classification: {query_type} (semantic)")
+            logger.debug(f"Classification: {query_type} (semantic - ambiguous)")
+        
+        # RULE 4: Default to semantic
+        else:
+            query_type = self._classify_intent(query)
+            logger.debug(f"Classification: {query_type} (semantic)")
         
         department = self.DEPARTMENTS.get(tag, "retail_digital")
-        logger.debug(f"      Department: {department}")
+        logger.debug(f"Department: {department}")
         
         return {
             "department": department,

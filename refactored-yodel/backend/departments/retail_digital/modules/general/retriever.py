@@ -110,33 +110,50 @@ class HybridRetriever:
         return fused[:top_k]
     
     def _rrf_fusion(self, semantic: List[Dict], bm25: List[Dict], k: int = 60) -> List[Dict]:
-        """Reciprocal Rank Fusion"""
-        logger.debug(f"   Starting RRF fusion (k={k})")
+        """Reciprocal Rank Fusion with proper scoring"""
+        logger.debug(f"Starting RRF fusion (k={k})")
+        
+        # Create doc ID → full document mapping
+        all_docs = {}
+        for doc in semantic + bm25:
+            doc_id = doc["text"][:100]
+            if doc_id not in all_docs:
+                all_docs[doc_id] = doc
+        
         scores = {}
         
         # Semantic scores (weight: 0.7)
         for rank, result in enumerate(semantic):
-            doc_id = result["text"][:100]  # Use text prefix as ID
-            scores[doc_id] = scores.get(doc_id, 0) + 0.7 / (k + rank + 1)
-        logger.debug(f"   RRF: Added {len(semantic)} semantic scores (weight=0.7)")
+            doc_id = result["text"][:100]
+            rrf_score = 0.7 / (k + rank + 1)
+            scores[doc_id] = scores.get(doc_id, 0) + rrf_score
+            logger.debug(f"Semantic rank {rank}: doc {doc_id[:30]}... → RRF score: {rrf_score:.4f}")
+        
+        logger.debug(f"RRF: Added {len(semantic)} semantic scores (weight=0.7)")
         
         # BM25 scores (weight: 0.3)
         for rank, result in enumerate(bm25):
             doc_id = result["text"][:100]
-            scores[doc_id] = scores.get(doc_id, 0) + 0.3 / (k + rank + 1)
-        logger.debug(f"   RRF: Added {len(bm25)} BM25 scores (weight=0.3)")
+            rrf_score = 0.3 / (k + rank + 1)
+            scores[doc_id] = scores.get(doc_id, 0) + rrf_score
+            logger.debug(f"BM25 rank {rank}: doc {doc_id[:30]}... → RRF score: {rrf_score:.4f}")
         
-        # Create unified results
-        all_results = {r["text"][:100]: r for r in semantic + bm25}
+        logger.debug(f"RRF: Added {len(bm25)} BM25 scores (weight=0.3)")
         
+        # Sort by final RRF score
+        sorted_docs = sorted(scores.items(), key=lambda x: x[1], reverse=True)
+        
+        # Build result list with proper scores
         fused = []
-        for doc_id, score in sorted(scores.items(), key=lambda x: x[1], reverse=True):
-            if doc_id in all_results:
-                result = all_results[doc_id].copy()
-                result["score"] = score
-                fused.append(result)
+        for doc_id, final_score in sorted_docs:
+            if doc_id in all_docs:
+                doc = all_docs[doc_id].copy()
+                doc["score"] = final_score  # Use RRF score
+                doc["rrf_rank"] = len(fused) + 1
+                fused.append(doc)
+                logger.debug(f"Final doc: {doc_id[:30]}... → score: {final_score:.4f}")
         
-        logger.debug(f"   RRF: Produced {len(fused)} fused results")
+        logger.debug(f"RRF: Produced {len(fused)} fused results")
         return fused
 
 retriever = HybridRetriever("retail_digital")
