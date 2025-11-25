@@ -20,6 +20,11 @@ sentence-transformers==2.3.1
 rank-bm25==0.2.2
 PyPDF2==3.0.1
 
+# Typo & Spell Correction - NEW
+fuzzywuzzy==0.18.0
+Levenshtein==0.23.0
+textblob==0.17.1
+
 # Utilities
 python-multipart==0.0.6
 python-dotenv==1.0.0

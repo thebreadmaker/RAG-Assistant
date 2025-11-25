@@ -3,6 +3,7 @@ from typing import Optional, Dict
 from sentence_transformers import SentenceTransformer
 from core.config import get_settings
 from core.logger import logger
+from fuzzywuzzy import fuzz
 
 settings = get_settings()
 
@@ -43,9 +44,47 @@ class QueryRouter:
                     convert_to_tensor=True
                 )
         return self.embedder
-    
+        
+    def correct_query_typos(self, query: str) -> str:
+            """
+            Correct common typos in query using fuzzy matching against known patterns.
+            """
+            # Common typo corrections for banking terms
+            corrections = {
+                "lfa": "LFA",
+                "eligibl": "eligible",
+                "exclued": "excluded",
+                "arrear": "arrears",
+                "appr": "approve",
+                "custmer": "customer",
+                "acnt": "account",
+                "chck": "check",
+                "delined": "declined",
+                "loab": "loan",
+                "limmit": "limit"
+            }
+            
+            query_lower = query.lower()
+            corrected_query = query
+            
+            for typo, correction in corrections.items():
+                if typo in query_lower:
+                    # Use fuzzy matching to find partial matches too
+                    for word in query.split():
+                        if fuzz.ratio(word.lower(), typo) > 80:
+                            corrected_query = corrected_query.replace(word, correction)
+                            logger.debug(f"Typo corrected: '{word}' → '{correction}'")
+            
+            return corrected_query
+
     def classify_query(self, query: str) -> Dict:
         logger.debug(f"Router classifying query: '{query[:80]}...'")
+        
+        # Step 1: Correct typos
+        corrected_query = self.correct_query_typos(query)
+        if corrected_query != query:
+            logger.info(f"Query typos corrected: '{query}' → '{corrected_query}'")
+            query = corrected_query
         
         tag = self._extract_tag(query)
         customer_id = self._extract_customer_id(query)

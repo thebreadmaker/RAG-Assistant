@@ -2,6 +2,8 @@ import csv
 from typing import Optional, Dict
 from pathlib import Path
 
+from fuzzywuzzy import fuzz
+
 class DataLoader:
     def __init__(self, csv_path: str):
         self.csv_path = Path(csv_path)
@@ -10,14 +12,34 @@ class DataLoader:
         if not self.csv_path.exists():
             raise FileNotFoundError(f"CSV not found: {self.csv_path}")
         
+        customer_id_str = str(customer_id).strip()
+        
         with open(self.csv_path, 'r', encoding='utf-8') as f:
             reader = csv.DictReader(f)
             for row in reader:
-                if row.get('CUS_NO', '').strip() == str(customer_id).strip():
+                if row.get('CUS_NO', '').strip() == customer_id_str:
                     return self._map_csv_row(row)
         
+        # If exact match not found, try fuzzy matching
+        with open(self.csv_path, 'r', encoding='utf-8') as f:
+            reader = csv.DictReader(f)
+            best_match = None
+            best_score = 0
+            
+            for row in reader:
+                csv_id = row.get('CUS_NO', '').strip()
+                score = fuzz.ratio(customer_id_str, csv_id)
+                
+                if score > best_score and score > 85:  # At least 85% match
+                    best_score = score
+                    best_match = row
+            
+            if best_match:
+                print(f"[INFO] Customer ID fuzzy match: '{customer_id_str}' matched to '{best_match.get('CUS_NO')}' (confidence: {best_score}%)")
+                return self._map_csv_row(best_match)
+        
         return None
-    
+
     def _map_csv_row(self, row: Dict) -> Dict:
         """Maps CSV columns to customer model"""
         return {

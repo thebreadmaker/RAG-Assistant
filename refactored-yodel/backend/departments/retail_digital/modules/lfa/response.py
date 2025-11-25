@@ -101,7 +101,7 @@ Be direct, factual, and supportive."""
             }
         }
 
-        response = requests.post(self.ollama_url, json=payload, timeout=30)
+        response = requests.post(self.ollama_url, json=payload, timeout=300)
         response.raise_for_status()
         
         return response.json().get('response', '')

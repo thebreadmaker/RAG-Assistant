@@ -5,16 +5,22 @@ import re
 from typing import Dict, List
 from core.logger import logger
 
+from fuzzywuzzy import fuzz
+from textblob import TextBlob
+
 class QueryAnalyzer:
     def analyze(self, query: str) -> Dict:
         """Analyze query to determine retrieval strategy"""
         
+        # Step 1: Correct spelling errors
+        corrected_query, spell_confidence = self.correct_spelling(query)
+        if corrected_query != query and spell_confidence > 0.85:
+            logger.debug(f"Query corrected due to spelling: '{query}' → '{corrected_query}'")
+            query = corrected_query
+        
         # Extract customer IDs
         customer_ids = self._extract_customer_ids(query)
-        
-        # Extract loan IDs (if applicable)
-        loan_ids = self._extract_loan_ids(query)
-        
+                
         # Detect synthesis intent
         is_synthesis = self._detect_synthesis_intent(query, customer_ids)
         
@@ -23,7 +29,7 @@ class QueryAnalyzer:
         
         analysis = {
             "customer_ids": customer_ids,
-            "loan_ids": loan_ids,
+            # "loan_ids": loan_ids,
             "requires_synthesis": is_synthesis,
             "topics": topics,
             "query_type": self._classify_query_type(query, customer_ids, is_synthesis)
@@ -92,6 +98,45 @@ class QueryAnalyzer:
             return "customer_lookup"
         else:
             return "general"
+    
 
+    def correct_spelling(self, text: str) -> tuple[str, float]:
+        """
+        Correct spelling errors using TextBlob and return corrected text with confidence.
+        Returns: (corrected_text, confidence_score)
+        """
+        try:
+            blob = TextBlob(text)
+            corrected = str(blob.correct())
+            
+            # Calculate confidence: how different is corrected from original?
+            similarity = fuzz.ratio(text.lower(), corrected.lower())
+            confidence = similarity / 100.0
+            
+            logger.debug(f"Spelling correction: '{text}' → '{corrected}' (confidence: {confidence:.2f})")
+            
+            return corrected, confidence
+        except Exception as e:
+            logger.debug(f"Spelling correction failed: {e}")
+            return text, 1.0
+    
+    def find_similar_customer_id(self, customer_id: str, known_ids: List[str]) -> tuple[str, float]:
+        """
+        Find similar customer ID using fuzzy matching if exact match not found.
+        Returns: (best_match_id, confidence_score)
+        """
+        best_match = None
+        best_score = 0.0
+        
+        for known_id in known_ids:
+            score = fuzz.ratio(customer_id, known_id)
+            if score > best_score:
+                best_score = score
+                best_match = known_id
+        
+        confidence = best_score / 100.0
+        logger.debug(f"Fuzzy match for '{customer_id}': '{best_match}' (confidence: {confidence:.2f})")
+        
+        return best_match, confidence
 # Singleton
 analyzer = QueryAnalyzer()

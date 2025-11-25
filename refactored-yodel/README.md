@@ -229,11 +229,11 @@ You should see `refactored-yodel-redis` running.
 ---
 
 ## Section 2.2: Start Backend (Single Command)
-
+d
 ```bash
 cd backend
-python3 -m uvicorn api.main:app --reload --host 0.0.0.0 --port 8000
-```
+python -m uvicorn api.main:app --reload --host 0.0.0.0 --port 8000
+```  
 
 That's it! The backend will:
 - ✅ Connect to Redis automatically
@@ -247,8 +247,8 @@ That's it! The backend will:
 
 ## Section 2.3: Start Frontend (New Terminal)
 
-```bash
-cd frontend
+```bash 
+cd frontend 
 npm run dev
 ```
 

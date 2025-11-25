@@ -80,7 +80,7 @@ async def health_check():
         import requests
         from core.config import get_settings
         settings = get_settings()
-        resp = requests.get(f"{settings.ollama_host}/api/tags", timeout=3)
+        resp = requests.get(f"{settings.ollama_host}/api/tags", timeout=10)
         ollama_ok = resp.status_code == 200
         logger.debug(f"   Ollama status: {'✅ OK' if ollama_ok else '❌ FAILED'} (status: {resp.status_code})")
     except Exception as e:
